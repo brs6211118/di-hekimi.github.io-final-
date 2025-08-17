@@ -1,856 +1,786 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<title>Klinik Yönetim Pro • Diş Kliniği</title>
-<meta name="description" content="Tek dosya diş kliniği yönetim sistemi — hasta, randevu, faturalama, odontogram ve daha fazlası." />
-<meta name="theme-color" content="#0ea5e9" />
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Crect width='16' height='16' rx='3' fill='%230ea5e9'/%3E%3Cpath d='M3 9c1 3 4 5 5 5s4-2 5-5C14 6 13 3 10 3 9 3 8 4 8 5 8 4 7 3 6 3 3 3 2 6 3 9Z' fill='white'/%3E%3C/svg%3E" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diş Kliniği Randevu Sistemi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-<style>
-/* ===================== THEME ===================== */
-:root{
-  --bg:#f7fbfd; --muted:#64748b; --text:#0b2540; --panel:#ffffff;
-  --brand:#0ea5e9; --accent:#06b6d4; --success:#10b981; --danger:#ef4444; --warning:#f59e0b;
-  --radius:14px; --shadow: 0 10px 30px rgba(2,6,23,0.08);
-  --max-width:1240px; --gap:16px; --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-}
-*{box-sizing:border-box}
-html,body,#app{height:100%}
-body{
-  margin:0; font-family:var(--font-sans); background:linear-gradient(180deg,var(--bg),#eaf8ff);
-  color:var(--text); -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
-  line-height:1.45; font-size:15px;
-}
-.dark{ --bg:#0b1220; --panel:#0f172a; --text:#e2e8f0; --muted:#94a3b8; --shadow:0 10px 30px rgba(0,0,0,0.35); background:linear-gradient(180deg,#0b1220,#0b1220) }
-a{color:var(--brand);text-decoration:none}
-.container{max-width:var(--max-width);margin:14px auto;padding:14px}
-/* ===================== HEADER ===================== */
-.header{
-  position:sticky; top:10px; z-index:50;
-  display:flex; align-items:center; gap:10px; padding:10px; border-radius:16px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.6));
-  box-shadow:var(--shadow); backdrop-filter: blur(6px); border: 1px solid rgba(10,10,10,0.03);
-}
-.dark .header{ background:linear-gradient(180deg, rgba(15,23,42,0.85), rgba(15,23,42,0.6)); border-color:rgba(255,255,255,0.06)}
-.brand{display:flex; gap:10px; align-items:center}
-.logo{
-  width:52px; height:52px; display:grid; place-items:center; border-radius:12px;
-  background: linear-gradient(135deg,var(--brand),var(--accent)); color:white; font-weight:800; font-size:20px;
-  box-shadow: 0 8px 20px rgba(14,165,233,0.18);
-}
-.brand h1{margin:0;font-size:1.05rem}
-.header-actions{margin-left:auto; display:flex; align-items:center; gap:10px}
-.icon-btn{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:10px;background:transparent;border:1px solid rgba(0,0,0,0.06);cursor:pointer}
-.icon-btn.primary{background:linear-gradient(90deg,var(--brand),var(--accent));color:white;border:0}
-.dark .icon-btn{border-color:rgba(255,255,255,0.08)}
-.search{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:10px;background:rgba(2,6,23,0.02);border:1px solid rgba(2,6,23,0.06)}
-.dark .search{background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.08)}
-.search input{border:0;background:transparent;outline:0;color:var(--text)}
-/* ===================== LAYOUT ===================== */
-.main{display:grid;grid-template-columns:270px 1fr;gap:16px;margin-top:14px}
-@media (max-width:980px){ .main{grid-template-columns:1fr} .sidebar{order:2} .content{order:1} }
-.sidebar{
-  background:var(--panel); padding:12px; border-radius:14px; box-shadow:var(--shadow); height:calc(100vh - 110px); overflow:auto;
-}
-.profile{display:flex;gap:10px;align-items:center}
-.avatar{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#fff,#f1f9ff);display:grid;place-items:center;border:1px solid rgba(2,6,23,0.06);color:#0ea5e9;font-weight:800}
-.dark .avatar{background:linear-gradient(135deg,#0b1220,#111827);border-color:rgba(255,255,255,0.06)}
-.menu{margin-top:12px;display:flex;flex-direction:column;gap:8px}
-.menu-item{display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;cursor:pointer;color:var(--muted)}
-.menu-item:hover{background:linear-gradient(90deg,rgba(14,165,233,0.08),transparent); color:var(--brand)}
-.menu-item.active{background:linear-gradient(90deg,rgba(14,165,233,0.18),transparent); color:var(--brand); font-weight:700}
-.small{font-size:12.5px;color:var(--muted)}
-/* ===================== CONTENT ===================== */
-.card{background:var(--panel); padding:12px; border-radius:12px; box-shadow:var(--shadow);}
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
-@media (max-width:980px){ .grid-2,.grid-3{grid-template-columns:1fr} }
-.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.col{display:flex;flex-direction:column;gap:8px}
-.badge{padding:5px 8px;border-radius:999px;background:rgba(2,6,23,0.06);font-weight:700}
-.kpis{display:flex;gap:12px;flex-wrap:wrap}
-.kpi{flex:1;min-width:160px;padding:10px;border-radius:10px;background:linear-gradient(180deg,#fff,#f6fdff)}
-.dark .kpi{background:linear-gradient(180deg,#111827,#0f172a)}
-.kpi small{display:block;color:var(--muted);margin-top:6px}
-.table{width:100%;border-collapse:collapse}
-.table th,.table td{padding:8px;border-bottom:1px solid rgba(2,6,23,0.06);text-align:left;vertical-align:top}
-.dark .table th,.dark .table td{border-color:rgba(255,255,255,0.06)}
-.input,select,textarea{padding:9px;border-radius:8px;border:1px solid rgba(2,6,23,0.08);background:transparent;color:var(--text);width:100%}
-.dark .input,.dark select,.dark textarea{border-color:rgba(255,255,255,0.08)}
-/* Buttons small variants */
-.btn{padding:8px 12px;border-radius:10px;border:1px solid rgba(2,6,23,0.08);background:transparent;cursor:pointer}
-.btn.primary{background:linear-gradient(90deg,var(--brand),var(--accent));color:#fff;border:0}
-.btn.warn{background:linear-gradient(90deg,#f59e0b,#f97316);color:#fff;border:0}
-.btn.danger{background:linear-gradient(90deg,#ef4444,#f43f5e);color:#fff;border:0}
-/* ===================== MODAL & TOAST ===================== */
-.modal-backdrop{position:fixed;inset:0;background:rgba(2,6,23,0.45);display:none;place-items:center;z-index:2000}
-.modal{background:var(--panel);width:min(980px,94%);padding:16px;border-radius:12px;box-shadow:var(--shadow);max-height:90vh;overflow:auto}
-.toasts{position:fixed;right:14px;bottom:14px;display:flex;flex-direction:column;gap:8px;z-index:9999}
-.toast{padding:10px 12px;border-radius:10px;background:rgba(2,6,23,0.85);color:white}
-/* ===================== PRINT ===================== */
-@media print{
-  body *{visibility:hidden}
-  .print-area, .print-area *{visibility:visible}
-  .print-area{position:fixed;left:0;top:0;width:100%}
-}
-</style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 10px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2196F3 0%, #21CBF3 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            min-height: 600px;
+        }
+
+        .form-section {
+            padding: 40px;
+            background: #f8f9fa;
+        }
+
+        .calendar-section {
+            padding: 40px;
+            background: white;
+            border-left: 1px solid #e0e0e0;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            color: #333;
+            margin-bottom: 25px;
+            text-align: center;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 3px;
+            background: #2196F3;
+            border-radius: 2px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #2196F3;
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #2196F3 0%, #21CBF3 100%);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(33, 150, 243, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .calendar {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .calendar-header {
+            background: #2196F3;
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .calendar-nav {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+
+        .calendar-nav:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .calendar-month {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+        }
+
+        .calendar-day-header {
+            background: #f5f5f5;
+            padding: 15px 5px;
+            text-align: center;
+            font-weight: 600;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            min-height: 50px;
+        }
+
+        .calendar-day:hover {
+            background: #e3f2fd;
+        }
+
+        .calendar-day.selected {
+            background: #2196F3;
+            color: white;
+        }
+
+        .calendar-day.other-month {
+            color: #ccc;
+        }
+
+        .time-slots {
+            margin-top: 30px;
+        }
+
+        .time-slots h3 {
+            color: #333;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .time-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 10px;
+        }
+
+        .time-slot {
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+            font-size: 14px;
+        }
+
+        .time-slot:hover {
+            border-color: #2196F3;
+            background: #e3f2fd;
+        }
+
+        .time-slot.selected {
+            background: #2196F3;
+            color: white;
+            border-color: #2196F3;
+        }
+
+        .time-slot.unavailable {
+            background: #f5f5f5;
+            color: #ccc;
+            cursor: not-allowed;
+            border-color: #f0f0f0;
+        }
+
+        .time-slot.unavailable:hover {
+            background: #f5f5f5;
+            border-color: #f0f0f0;
+        }
+
+        .appointments-list {
+            margin-top: 30px;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .appointment-item {
+            background: #f8f9fa;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #2196F3;
+        }
+
+        .appointment-item h4 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .appointment-item p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            body {
+                padding: 5px;
+            }
+
+            .header {
+                padding: 20px 15px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+                margin-bottom: 8px;
+            }
+
+            .header p {
+                font-size: 0.95rem;
+            }
+
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+
+            .form-section {
+                padding: 25px 20px;
+                order: 1;
+            }
+
+            .calendar-section {
+                padding: 25px 20px;
+                border-left: none;
+                border-top: 1px solid #e0e0e0;
+                order: 2;
+            }
+
+            .section-title {
+                font-size: 1.4rem;
+                margin-bottom: 20px;
+            }
+
+            .form-group {
+                margin-bottom: 18px;
+            }
+
+            input, select, textarea {
+                padding: 12px;
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+
+            .btn {
+                padding: 14px 25px;
+                font-size: 15px;
+            }
+
+            .calendar-header {
+                padding: 15px;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .calendar-month {
+                font-size: 1.2rem;
+            }
+
+            .calendar-nav {
+                font-size: 18px;
+                padding: 8px 12px;
+            }
+
+            .calendar-day {
+                min-height: 45px;
+                font-size: 14px;
+            }
+
+            .calendar-day-header {
+                padding: 12px 3px;
+                font-size: 12px;
+            }
+
+            .time-grid {
+                grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+                gap: 8px;
+            }
+
+            .time-slot {
+                padding: 8px 4px;
+                font-size: 12px;
+            }
+
+            .appointments-list {
+                padding: 15px;
+                margin-top: 20px;
+            }
+
+            .appointment-item {
+                padding: 12px;
+            }
+
+            .appointment-item h4 {
+                font-size: 14px;
+            }
+
+            .appointment-item p {
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                margin: 0;
+                border-radius: 0;
+                min-height: 100vh;
+            }
+
+            .header {
+                padding: 15px 10px;
+            }
+
+            .header h1 {
+                font-size: 1.6rem;
+            }
+
+            .form-section,
+            .calendar-section {
+                padding: 20px 15px;
+            }
+
+            .section-title {
+                font-size: 1.3rem;
+            }
+
+            .calendar-header {
+                padding: 12px;
+            }
+
+            .calendar-month {
+                font-size: 1.1rem;
+            }
+
+            .calendar-day {
+                min-height: 40px;
+                font-size: 13px;
+            }
+
+            .calendar-day-header {
+                padding: 10px 2px;
+                font-size: 11px;
+            }
+
+            .time-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 6px;
+            }
+
+            .time-slot {
+                padding: 8px 2px;
+                font-size: 11px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .header h1 {
+                font-size: 1.4rem;
+            }
+
+            .section-title {
+                font-size: 1.2rem;
+            }
+
+            .time-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .calendar-day {
+                min-height: 35px;
+                font-size: 12px;
+            }
+        }
+
+        /* Landscape orientation for mobile */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .main-content {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .calendar-section {
+                border-left: 1px solid #e0e0e0;
+                border-top: none;
+            }
+
+            .form-section {
+                order: 0;
+            }
+
+            .calendar-section {
+                order: 0;
+            }
+        }
+    </style>
 </head>
 <body>
-<div id="app" class="container" role="application" aria-labelledby="appTitle">
-  <!-- Header -->
-  <header class="header" role="banner">
-    <div class="brand">
-      <div class="logo">K</div>
-      <div>
-        <h1 id="appTitle">Klinik Yönetim Pro</h1>
-        <div class="small">Hasta • Randevu • Faturalama • Odontogram • Envanter</div>
-      </div>
+    <div class="container">
+        <div class="header">
+            <h1>🦷 Diş Kliniği Randevu Sistemi</h1>
+            <p>Sağlıklı gülümsemeniz için hemen randevu alın</p>
+        </div>
+
+        <div class="main-content">
+            <div class="form-section">
+                <h2 class="section-title">Randevu Bilgileri</h2>
+                <form id="appointmentForm">
+                    <div class="form-group">
+                        <label for="name">Ad Soyad *</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Telefon *</label>
+                        <input type="tel" id="phone" name="phone" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">E-posta</label>
+                        <input type="email" id="email" name="email">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="treatment">Tedavi Türü</label>
+                        <select id="treatment" name="treatment">
+                            <option value="">Seçiniz</option>
+                            <option value="muayene">Genel Muayene</option>
+                            <option value="temizlik">Diş Temizliği</option>
+                            <option value="dolgu">Dolgu</option>
+                            <option value="kanal">Kanal Tedavisi</option>
+                            <option value="cekim">Diş Çekimi</option>
+                            <option value="protez">Protez</option>
+                            <option value="ortodonti">Ortodonti</option>
+                            <option value="estetik">Estetik Diş Hekimliği</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="notes">Notlar</label>
+                        <textarea id="notes" name="notes" placeholder="Özel durumlarınız varsa belirtiniz..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn">Randevu Al</button>
+                </form>
+            </div>
+
+            <div class="calendar-section">
+                <h2 class="section-title">Tarih ve Saat Seçimi</h2>
+                
+                <div class="calendar">
+                    <div class="calendar-header">
+                        <button class="calendar-nav" id="prevMonth">‹</button>
+                        <div class="calendar-month" id="currentMonth">Aralık 2024</div>
+                        <button class="calendar-nav" id="nextMonth">›</button>
+                    </div>
+                    <div class="calendar-grid" id="calendarGrid">
+                        <div class="calendar-day-header">Pzt</div>
+                        <div class="calendar-day-header">Sal</div>
+                        <div class="calendar-day-header">Çar</div>
+                        <div class="calendar-day-header">Per</div>
+                        <div class="calendar-day-header">Cum</div>
+                        <div class="calendar-day-header">Cmt</div>
+                        <div class="calendar-day-header">Paz</div>
+                    </div>
+                </div>
+
+                <div class="time-slots">
+                    <h3>Uygun Saatler</h3>
+                    <div class="time-grid" id="timeSlots">
+                        <div class="time-slot">09:00</div>
+                        <div class="time-slot">09:30</div>
+                        <div class="time-slot">10:00</div>
+                        <div class="time-slot">10:30</div>
+                        <div class="time-slot">11:00</div>
+                        <div class="time-slot">11:30</div>
+                        <div class="time-slot">13:30</div>
+                        <div class="time-slot">14:00</div>
+                        <div class="time-slot">14:30</div>
+                        <div class="time-slot">15:00</div>
+                        <div class="time-slot">15:30</div>
+                        <div class="time-slot">16:00</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="appointments-list">
+            <h3>Yaklaşan Randevularım</h3>
+            <div id="appointmentsList">
+                <div class="appointment-item">
+                    <h4>Genel Muayene</h4>
+                    <p>📅 18 Aralık 2024 - 🕐 14:30</p>
+                    <p>👤 Ahmet Yılmaz - 📞 0532 123 45 67</p>
+                </div>
+                <div class="appointment-item">
+                    <h4>Diş Temizliği</h4>
+                    <p>📅 19 Aralık 2024 - 🕐 10:00</p>
+                    <p>👤 Ayşe Kaya - 📞 0541 987 65 43</p>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="header-actions" role="navigation">
-      <div class="search" role="search">
-        <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M21 20l-5.6-5.6A7.5 7.5 0 1 0 17.5 17.5L23 23z"></path></svg>
-        <input id="globalSearch" aria-label="Ara" placeholder="Hasta, randevu..." />
-      </div>
-      <button class="icon-btn" id="btnTheme" aria-pressed="false" title="Tema">🌗</button>
-      <button class="icon-btn primary" id="btnNewApptHeader" title="Yeni Randevu">Yeni Randevu</button>
-      <button class="icon-btn" id="btnExportAll" title="Dışa Aktar">↧ Dışa Aktar</button>
-      <div class="avatar" id="userAvatar" role="img" aria-label="Kullanıcı avatar">A</div>
-    </div>
-  </header>
 
-  <!-- Main layout -->
-  <main class="main" role="main">
-    <!-- Sidebar -->
-    <aside class="sidebar" role="complementary" aria-label="Sol menü">
-      <div class="profile">
-        <div class="avatar" aria-hidden="true">K</div>
-        <div class="col">
-          <div style="font-weight:700">Dr. Yönetici</div>
-          <div class="small">Örnek Klinik</div>
-        </div>
-      </div>
-      <nav class="menu" role="menu" aria-label="Ana menü">
-        <div class="menu-item active" data-route="dashboard" tabindex="0" role="menuitem">🏠 Genel Bakış</div>
-        <div class="menu-item" data-route="patients" tabindex="0" role="menuitem">🧾 Hastalar</div>
-        <div class="menu-item" data-route="appointments" tabindex="0" role="menuitem">📅 Randevular</div>
-        <div class="menu-item" data-route="odontogram" tabindex="0" role="menuitem">🦷 Odontogram</div>
-        <div class="menu-item" data-route="inventory" tabindex="0" role="menuitem">📦 Envanter</div>
-        <div class="menu-item" data-route="billing" tabindex="0" role="menuitem">💳 Faturalama</div>
-        <div class="menu-item" data-route="reports" tabindex="0" role="menuitem">📊 Raporlar</div>
-        <div class="menu-item" data-route="settings" tabindex="0" role="menuitem">⚙️ Ayarlar</div>
-      </nav>
+    <script>
+        // Calendar functionality
+        class AppointmentCalendar {
+            constructor() {
+                this.currentDate = new Date();
+                this.selectedDate = null;
+                this.selectedTime = null;
+                this.appointments = [];
+                this.init();
+            }
 
-      <div style="height:12px"></div>
+            init() {
+                this.renderCalendar();
+                this.bindEvents();
+                this.loadTimeSlots();
+            }
 
-      <div class="card small">
-        <div class="row" style="justify-content:space-between">
-          <div>
-            <div style="font-weight:800">Örnek Klinik</div>
-            <div class="small">Şube: 2 • Çalışan: 12</div>
-          </div>
-          <div class="col" style="align-items:flex-end">
-            <div class="badge" id="statusBadge">Offline</div>
-            <small class="small">SW: <span id="swState">—</span></small>
-          </div>
-        </div>
-      </div>
+            bindEvents() {
+                document.getElementById('prevMonth').addEventListener('click', () => {
+                    this.currentDate.setMonth(this.currentDate.getMonth() - 1);
+                    this.renderCalendar();
+                });
 
-      <div style="height:12px"></div>
+                document.getElementById('nextMonth').addEventListener('click', () => {
+                    this.currentDate.setMonth(this.currentDate.getMonth() + 1);
+                    this.renderCalendar();
+                });
 
-      <div class="card small" aria-label="Hızlı bağlantılar">
-        <div class="col">
-          <button class="btn" id="btnOpenPatients">Hasta Listesi</button>
-          <button class="btn" id="btnOpenCalendar">Takvime Git</button>
-          <button class="btn" id="btnExportAudit">Audit Dışa Aktar</button>
-        </div>
-      </div>
+                document.getElementById('appointmentForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.handleAppointmentSubmit();
+                });
+            }
 
-      <div style="height:18px"></div>
+            renderCalendar() {
+                const year = this.currentDate.getFullYear();
+                const month = this.currentDate.getMonth();
+                
+                // Update month display
+                const monthNames = [
+                    'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
+                    'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'
+                ];
+                document.getElementById('currentMonth').textContent = `${monthNames[month]} ${year}`;
 
-      <div class="small">Kısayollar</div>
-      <div class="small">N: Yeni Hasta • A: Yeni Randevu • F: Ara • S: Sistem Testi</div>
-    </aside>
+                // Calculate calendar days
+                const firstDay = new Date(year, month, 1);
+                const lastDay = new Date(year, month + 1, 0);
+                const startDate = new Date(firstDay);
+                startDate.setDate(startDate.getDate() - (firstDay.getDay() + 6) % 7);
 
-    <!-- Content -->
-    <section class="content" id="content" role="main" aria-live="polite">
-      <!-- Dashboard -->
-      <div class="card" id="dashboardView">
-        <div class="row" style="justify-content:space-between">
-          <div>
-            <div style="font-weight:800;font-size:1.1rem">Günün Özeti</div>
-            <div class="small">Liste ve hızlı yönetim</div>
-          </div>
-          <div>
-            <div style="text-align:right"><div style="font-weight:800" id="kpiTodayTop">—</div><div class="small">Bugün</div></div>
-          </div>
-        </div>
+                const calendarGrid = document.getElementById('calendarGrid');
+                // Remove existing day cells
+                const existingDays = calendarGrid.querySelectorAll('.calendar-day');
+                existingDays.forEach(day => day.remove());
 
-        <div class="kpis" style="margin-top:12px">
-          <div class="kpi">
-            <div style="font-weight:800" id="kpiToday">—</div>
-            <small>Bugünkü Randevular</small>
-          </div>
-          <div class="kpi">
-            <div style="font-weight:800" id="kpiMonth">—</div>
-            <small>Bu Ay Tahmini Gelir</small>
-          </div>
-          <div class="kpi">
-            <div style="font-weight:800" id="kpiOpen">—</div>
-            <small>Açık Bakiye</small>
-          </div>
-        </div>
+                // Generate calendar days
+                for (let i = 0; i < 42; i++) {
+                    const cellDate = new Date(startDate);
+                    cellDate.setDate(startDate.getDate() + i);
 
-        <div style="height:12px"></div>
+                    const dayElement = document.createElement('div');
+                    dayElement.className = 'calendar-day';
+                    dayElement.textContent = cellDate.getDate();
 
-        <div class="grid-2">
-          <div class="card">
-            <div class="row" style="justify-content:space-between">
-              <div style="font-weight:800">Bugün Randevular</div>
-              <button class="btn" id="btnAddQuickAppt">Hızlı Randevu</button>
-            </div>
-            <div id="apptList" style="margin-top:8px"></div>
-          </div>
-          <div class="card">
-            <div style="font-weight:800;margin-bottom:6px">Doktorlarımız</div>
-            <div id="doctorList" class="col"></div>
-          </div>
-        </div>
-      </div>
+                    if (cellDate.getMonth() !== month) {
+                        dayElement.classList.add('other-month');
+                    }
 
-      <!-- Other route containers (filled dynamically) -->
-      <div id="routeContainer"></div>
+                    if (cellDate < new Date().setHours(0, 0, 0, 0)) {
+                        dayElement.style.color = '#ccc';
+                        dayElement.style.cursor = 'not-allowed';
+                    } else {
+                        dayElement.addEventListener('click', () => {
+                            this.selectDate(cellDate);
+                        });
+                    }
 
-      <div style="height:8px"></div>
-      <div class="small">Demo uygulama — Veriler IndexedDB'de saklanır. Üretimde backend gereklidir.</div>
-    </section>
-  </main>
+                    calendarGrid.appendChild(dayElement);
+                }
+            }
 
-  <!-- Modal backdrop and modal content -->
-  <div class="modal-backdrop" id="modalBackdrop" aria-hidden="true" role="dialog" aria-modal="true">
-    <div class="modal" id="modalContent" role="document"></div>
-  </div>
+            selectDate(date) {
+                // Remove previous selection
+                document.querySelectorAll('.calendar-day.selected').forEach(day => {
+                    day.classList.remove('selected');
+                });
 
-  <!-- Toasts -->
-  <div class="toasts" id="toasts" aria-live="polite" aria-atomic="true"></div>
-</div>
+                // Add selection to clicked day
+                event.target.classList.add('selected');
+                this.selectedDate = date;
+                this.loadTimeSlots();
+            }
 
-<script>
-/* ============================================================================
-   Klinik Yönetim Pro — Tek Dosya SPA
-   - Mobil uyumlu, modern, özgün tasarım
-   - Tüm butonlar çalışır (modal, işlem veya gezinti)
-   - IndexedDB kalıcı veri, PWA, dışa/içe aktarma
-   ============================================================================ */
-(function(){
-  'use strict';
+            loadTimeSlots() {
+                const timeSlots = document.querySelectorAll('.time-slot');
+                timeSlots.forEach(slot => {
+                    slot.classList.remove('selected', 'unavailable');
+                    slot.addEventListener('click', () => {
+                        this.selectTime(slot);
+                    });
+                });
 
-  /* ---------------------------- Utilities ---------------------------- */
-  const $ = (s,root=document)=>root.querySelector(s);
-  const $$ = (s,root=document)=>Array.from(root.querySelectorAll(s));
-  const uid = (p='id')=>p+'_'+Math.random().toString(36).slice(2,9);
-  const nowISO = ()=>new Date().toISOString();
-  const money = (n)=>'₺'+(n||0).toLocaleString('tr-TR');
-  function escapeHtml(s){ if(s==null) return ''; return String(s).replace(/[&<>"'`=\/]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','/':'&#x2F;','`':'&#x60;','=':'&#x3D;'}[c])); }
-  function toast(msg,timeout=3000){ const t=document.createElement('div'); t.className='toast'; t.textContent=msg; $('#toasts').appendChild(t); setTimeout(()=>t.remove(),timeout); }
-  function modal(html,title=''){ const b=$('#modalBackdrop'); const c=$('#modalContent'); c.innerHTML=`<div class="row" style="justify-content:space-between"><h3 style="margin:0">${escapeHtml(title)}</h3><button class="btn" id="modalClose" aria-label="Kapat">✕</button></div><div style="margin-top:10px">${html}</div>`; b.style.display='grid'; b.setAttribute('aria-hidden','false'); $('#modalClose').addEventListener('click',closeModal); b.addEventListener('click',e=>{ if(e.target===b) closeModal();}); }
-  function closeModal(){ const b=$('#modalBackdrop'); b.style.display='none'; b.setAttribute('aria-hidden','true'); }
-  function downloadFile(name,content,type='text/plain;charset=utf-8'){ const blob=new Blob([content],{type}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),60000); }
-  function confirmBox(text, onYes){ modal(`<p>${escapeHtml(text)}</p><div style="text-align:right"><button class="btn" id="no">Vazgeç</button> <button class="btn danger" id="yes">Evet</button></div>`,'Onay'); setTimeout(()=>{$('#no').onclick=closeModal; $('#yes').onclick=()=>{ closeModal(); onYes&&onYes(); }},50); }
-  function inputPrompt(label, placeholder, onOk, value=''){ modal(`<label class="small">${escapeHtml(label)}<input class="input" id="promptInput" placeholder="${escapeHtml(placeholder||'')}" value="${escapeHtml(value)}"/></label><div style="text-align:right;margin-top:8px"><button class="btn" id="cancelP">İptal</button> <button class="btn primary" id="okP">Tamam</button></div>`,'Girdi'); setTimeout(()=>{$('#cancelP').onclick=closeModal; $('#okP').onclick=()=>{ const v=$('#promptInput').value.trim(); closeModal(); onOk&&onOk(v); }},50); }
+                // Mark some random slots as unavailable (simulation)
+                const unavailableSlots = [2, 5, 8];
+                unavailableSlots.forEach(index => {
+                    if (timeSlots[index]) {
+                        timeSlots[index].classList.add('unavailable');
+                    }
+                });
+            }
 
-  /* ---------------------------- IndexedDB ---------------------------- */
-  const DB = (function(){
-    const NAME='clinic_pro_db', VER=7;
-    let db=null;
-    function open(){
-      return new Promise((res,rej)=>{
-        if(db) return res(db);
-        const r=indexedDB.open(NAME,VER);
-        r.onupgradeneeded=(e)=>{
-          const idb=e.target.result;
-          if(!idb.objectStoreNames.contains('patients')) idb.createObjectStore('patients',{keyPath:'id'});
-          if(!idb.objectStoreNames.contains('appts')) idb.createObjectStore('appts',{keyPath:'id'});
-          if(!idb.objectStoreNames.contains('inventory')) idb.createObjectStore('inventory',{keyPath:'id'});
-          if(!idb.objectStoreNames.contains('invoices')) idb.createObjectStore('invoices',{keyPath:'id'});
-          if(!idb.objectStoreNames.contains('users')) idb.createObjectStore('users',{keyPath:'id'});
-          if(!idb.objectStoreNames.contains('audit')) idb.createObjectStore('audit',{keyPath:'id',autoIncrement:true});
-        };
-        r.onsuccess=()=>{ db=r.result; res(db); };
-        r.onerror=()=>rej(r.error);
-      });
-    }
-    function tx(store,mode='readonly'){ return open().then(db=>db.transaction(store,mode).objectStore(store)); }
-    function getAll(store){ return tx(store).then(os=>new Promise((res,rej)=>{ const req=os.getAll(); req.onsuccess=()=>res(req.result); req.onerror=()=>rej(req.error);})); }
-    function get(store,key){ return tx(store).then(os=>new Promise((res,rej)=>{ const req=os.get(key); req.onsuccess=()=>res(req.result); req.onerror=()=>rej(req.error);})); }
-    function put(store,obj){ return tx(store,'readwrite').then(os=>new Promise((res,rej)=>{ const req=os.put(obj); req.onsuccess=()=>res(req.result); req.onerror=()=>rej(req.error);})); }
-    function del(store,key){ return tx(store,'readwrite').then(os=>new Promise((res,rej)=>{ const req=os.delete(key); req.onsuccess=()=>res(true); req.onerror=()=>rej(req.error);})); }
-    return {open,getAll,get,put,del};
-  })();
+            selectTime(timeSlot) {
+                if (timeSlot.classList.contains('unavailable')) return;
 
-  async function logAudit(action, detail){ await DB.put('audit',{time:nowISO(), action, detail}); }
+                document.querySelectorAll('.time-slot.selected').forEach(slot => {
+                    slot.classList.remove('selected');
+                });
 
-  /* ---------------------------- Seed ---------------------------- */
-  async function seedIfEmpty(){
-    const pats=await DB.getAll('patients');
-    if(pats.length>0) return;
-    const doctors=['Dr. Elif','Dr. Kerem','Dr. Aylin'];
-    await DB.put('users',{id:uid('u'),name:'Dr. Elif',role:'Hekim'});
-    await DB.put('users',{id:uid('u'),name:'Dr. Kerem',role:'Hekim'});
-    await DB.put('users',{id:uid('u'),name:'Dr. Aylin',role:'Hekim'});
-    for(let i=0;i<40;i++){
-      const p={id:uid('pat'),name:`Hasta ${i+1}`,phone:`+90 5${Math.floor(100000000+Math.random()*899999999)}`,birth:1980+Math.floor(Math.random()*30),notes:'',createdAt:nowISO(),teeth:{}};
-      await DB.put('patients',p);
-    }
-    for(let i=0;i<30;i++){
-      const d=new Date(); d.setDate(d.getDate()+Math.floor(Math.random()*14)-3); d.setHours(9+Math.floor(Math.random()*8), [0,15,30,45][Math.floor(Math.random()*4)],0,0);
-      const ap={id:uid('appt'),patientId:(await DB.getAll('patients'))[Math.floor(Math.random()*40)].id,doctor:doctors[Math.floor(Math.random()*doctors.length)],start:d.toISOString(),duration:30,status:['Onaylı','Beklemede','Geldi','İptal'][Math.floor(Math.random()*4)],createdAt:nowISO(),price:300+Math.floor(Math.random()*1500)};
-      await DB.put('appts',ap);
-    }
-    await DB.put('inventory',{id:uid('inv'),name:'İmplant Vida',stock:12,unit:'adet'});
-    await DB.put('inventory',{id:uid('inv'),name:'Anestezik',stock:34,unit:'flakon'});
-    await DB.put('inventory',{id:uid('inv'),name:'Kompozit',stock:20,unit:'şırınga'});
-    toast('Örnek veriler oluşturuldu');
-  }
+                timeSlot.classList.add('selected');
+                this.selectedTime = timeSlot.textContent;
+            }
 
-  /* ---------------------------- Header actions ---------------------------- */
-  $('#btnTheme').addEventListener('click',()=>{
-    document.body.classList.toggle('dark');
-    const pressed = $('#btnTheme').getAttribute('aria-pressed')==='true';
-    $('#btnTheme').setAttribute('aria-pressed', String(!pressed));
-    localStorage.setItem('theme', document.body.classList.contains('dark')?'dark':'light');
-  });
+            handleAppointmentSubmit() {
+                const formData = new FormData(document.getElementById('appointmentForm'));
+                const appointmentData = {
+                    name: formData.get('name'),
+                    phone: formData.get('phone'),
+                    email: formData.get('email'),
+                    treatment: formData.get('treatment'),
+                    notes: formData.get('notes'),
+                    date: this.selectedDate,
+                    time: this.selectedTime
+                };
 
-  $('#btnNewApptHeader').addEventListener('click',()=> openQuickApptModal());
-  $('#btnExportAll').addEventListener('click', async ()=>{
-    const data={
-      patients:await DB.getAll('patients'),
-      appts:await DB.getAll('appts'),
-      invoices:await DB.getAll('invoices'),
-      inventory:await DB.getAll('inventory'),
-      users:await DB.getAll('users'),
-      audit:await DB.getAll('audit'),
-    };
-    downloadFile('klinik-export.json', JSON.stringify(data,null,2), 'application/json');
-    toast('Dışa aktarıldı');
-  });
+                if (!appointmentData.name || !appointmentData.phone) {
+                    alert('Lütfen zorunlu alanları doldurunuz.');
+                    return;
+                }
 
-  $('#globalSearch').addEventListener('input', async (e)=>{
-    const q=e.target.value.trim().toLowerCase();
-    if(!q) return;
-    const pats=(await DB.getAll('patients')).filter(p=> (p.name||'').toLowerCase().includes(q) || (p.phone||'').includes(q)).slice(0,10);
-    const appts=(await DB.getAll('appts')).filter(a=> (a.doctor||'').toLowerCase().includes(q)).slice(0,10);
-    modal(`<div class="grid-2">
-      <div><div style="font-weight:700">Hastalar</div>${pats.map(p=>`<div style="padding:8px;border-bottom:1px solid rgba(0,0,0,0.06)"><strong>${escapeHtml(p.name)}</strong><div class="small">${escapeHtml(p.phone||'')}</div><div style="text-align:right"><button class="btn" data-p="${p.id}">Aç</button></div></div>`).join('')||'<div class="small">Yok</div>'}</div>
-      <div><div style="font-weight:700">Randevular</div>${appts.map(a=>`<div style="padding:8px;border-bottom:1px solid rgba(0,0,0,0.06)"><strong>${new Date(a.start).toLocaleString()}</strong><div class="small">${escapeHtml(a.doctor)}</div></div>`).join('')||'<div class="small">Yok</div>'}</div>
-    </div>`,'Arama');
-    setTimeout(()=>{$$('[data-p]').forEach(b=>b.onclick=()=>{ closeModal(); go('patients',{openId:b.getAttribute('data-p')}); });},30);
-  });
+                if (!this.selectedDate || !this.selectedTime) {
+                    alert('Lütfen tarih ve saat seçiniz.');
+                    return;
+                }
 
-  /* ---------------------------- Sidebar Nav ---------------------------- */
-  function setupNav(){
-    $$('.menu-item').forEach(item=>{
-      item.addEventListener('click',()=>{
-        $$('.menu-item').forEach(i=>i.classList.remove('active'));
-        item.classList.add('active');
-        go(item.dataset.route);
-      });
-    });
-    $('#btnOpenPatients').addEventListener('click',()=>go('patients'));
-    $('#btnOpenCalendar').addEventListener('click',()=>go('appointments'));
-  }
+                // Simulate appointment creation
+                this.appointments.push(appointmentData);
+                alert('Randevunuz başarıyla oluşturuldu!');
+                
+                // Reset form
+                document.getElementById('appointmentForm').reset();
+                this.selectedDate = null;
+                this.selectedTime = null;
+                
+                // Update UI
+                document.querySelectorAll('.calendar-day.selected, .time-slot.selected').forEach(el => {
+                    el.classList.remove('selected');
+                });
 
-  /* ---------------------------- Views (Routes) ---------------------------- */
-  const routes={
-    async dashboard(){
-      $('#dashboardView').style.display='block';
-      $('#routeContainer').innerHTML='';
-      await refreshKpis();
-      await renderTodayAppointments();
-      await renderDoctors();
-    },
-    async patients(params={}){
-      $('#dashboardView').style.display='none';
-      const list = await DB.getAll('patients');
-      $('#routeContainer').innerHTML=`
-        <div class="card">
-          <div class="row" style="justify-content:space-between;align-items:center">
-            <h3 style="margin:0">Hastalar</h3>
-            <div class="row">
-              <button class="btn" id="btnImportCSV">İçe Aktar (CSV)</button>
-              <button class="btn primary" id="btnNewPatient">Yeni Hasta</button>
-            </div>
-          </div>
-          <div style="margin-top:8px;overflow:auto">
-            <table class="table">
-              <thead><tr><th>Ad Soyad</th><th>Telefon</th><th>Doğum Yılı</th><th>Not</th><th></th></tr></thead>
-              <tbody id="patientsTbody">
-                ${list.map(p=>`<tr data-id="${p.id}"><td>${escapeHtml(p.name)}</td><td>${escapeHtml(p.phone||'')}</td><td>${escapeHtml(p.birth||'')}</td><td class="small">${escapeHtml(p.notes||'')}</td><td><button class="btn" data-act="open">Aç</button></td></tr>`).join('')}
-              </tbody>
-            </table>
-          </div>
-        </div>`;
-      $('#btnNewPatient').onclick=()=>editPatient();
-      $('#btnImportCSV').onclick=importCSVPatients;
-      $('#patientsTbody').onclick=(e)=>{
-        const tr=e.target.closest('tr'); if(!tr) return;
-        if(e.target.matches('[data-act="open"]')) openPatient(tr.dataset.id);
-      };
-      if(params.openId) openPatient(params.openId);
-    },
-    async appointments(){
-      $('#dashboardView').style.display='none';
-      const appts=await DB.getAll('appts');
-      const doctors = (await DB.getAll('users')).filter(u=>u.role==='Hekim').map(u=>u.name);
-      const today = new Date().toISOString().slice(0,10);
-      $('#routeContainer').innerHTML=`
-        <div class="card">
-          <div class="row" style="justify-content:space-between">
-            <h3 style="margin:0">Randevular</h3>
-            <button class="btn primary" id="btnNewAppt">Yeni Randevu</button>
-          </div>
-          <div class="row" style="margin-top:8px">
-            <label class="small">Tarih<input class="input" type="date" id="apptDate" value="${today}"/></label>
-            <label class="small">Hekim<select id="apptDoc" class="input"><option value="">Tümü</option>${doctors.map(d=>`<option>${escapeHtml(d)}</option>`)}</select></label>
-            <button class="btn" id="btnFilter">Filtrele</button>
-          </div>
-          <div id="apptTableWrap" style="margin-top:8px"></div>
-        </div>`;
-      $('#btnNewAppt').onclick=()=>openQuickApptModal();
-      $('#btnFilter').onclick=renderApptTable;
-      renderApptTable();
-      async function renderApptTable(){
-        const dateVal=$('#apptDate').value;
-        const docVal=$('#apptDoc').value;
-        const all=await DB.getAll('appts');
-        const rows=all.filter(a=> (!dateVal || new Date(a.start).toISOString().slice(0,10)===dateVal) && (!docVal || a.doctor===docVal)).sort((a,b)=>new Date(a.start)-new Date(b.start));
-        $('#apptTableWrap').innerHTML=`<table class="table"><thead><tr><th>Saat</th><th>Hasta</th><th>Hekim</th><th>Durum</th><th>Ücret</th><th></th></tr></thead><tbody>${
-          (await Promise.all(rows.map(async a=>{
-            const p=await DB.get('patients',a.patientId);
-            return `<tr data-id="${a.id}"><td>${new Date(a.start).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</td><td>${escapeHtml(p?.name||a.patientId)}</td><td>${escapeHtml(a.doctor)}</td><td>${escapeHtml(a.status)}</td><td>${money(a.price||0)}</td><td><button class="btn" data-act="open">Aç</button></td></tr>`;
-          }))).join('')
-        }</tbody></table>`;
-        $('#apptTableWrap').onclick=(e)=>{ const tr=e.target.closest('tr'); if(!tr) return; if(e.target.matches('[data-act="open"]')) openAppt(tr.dataset.id); };
-      }
-    },
-    async odontogram(){
-      $('#dashboardView').style.display='none';
-      const pats=await DB.getAll('patients');
-      $('#routeContainer').innerHTML=`
-        <div class="card">
-          <div class="row" style="justify-content:space-between">
-            <h3 style="margin:0">Odontogram</h3>
-            <div class="row">
-              <label class="small">Hasta<select id="odoPatient" class="input">${pats.map(p=>`<option value="${p.id}">${escapeHtml(p.name)}</option>`)}</select></label>
-              <button class="btn" id="btnSaveOdonto">Kaydet</button>
-            </div>
-          </div>
-          <div id="odontogramCanvas" style="height:260px;display:grid;place-items:center;margin-top:10px"></div>
-          <div class="small">Bir dişe tıklayın: <span class="badge">Dolgu</span> durumunu değiştir.</div>
-        </div>`;
-      renderOdontogram();
-      $('#btnSaveOdonto').onclick=saveOdonto;
-      $('#odoPatient').onchange=renderOdontogram;
-      async function renderOdontogram(){
-        const pid=$('#odoPatient').value;
-        const p=await DB.get('patients',pid);
-        const marks=p?.teeth||{};
-        const c=$('#odontogramCanvas'); c.innerHTML='';
-        const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
-        svg.setAttribute('viewBox','0 0 640 200'); svg.setAttribute('width','100%'); svg.setAttribute('height','100%');
-        for(let i=0;i<32;i++){
-          const x=10+(i%16)*39, y=i<16?20:110;
-          const rect=document.createElementNS('http://www.w3.org/2000/svg','rect');
-          rect.setAttribute('x',x); rect.setAttribute('y',y); rect.setAttribute('width',34); rect.setAttribute('height',34); rect.setAttribute('rx',6);
-          rect.setAttribute('fill', marks[i]?'#0ea5e9':'#fff'); rect.setAttribute('stroke','#cbd5e1');
-          rect.dataset.idx=i;
-          rect.addEventListener('click',()=>{ marks[i]=!marks[i]; rect.setAttribute('fill',marks[i]?'#0ea5e9':'#fff'); });
-          svg.appendChild(rect);
+                this.updateAppointmentsList();
+            }
+
+            updateAppointmentsList() {
+                const appointmentsList = document.getElementById('appointmentsList');
+                appointmentsList.innerHTML = '';
+
+                this.appointments.forEach(appointment => {
+                    const appointmentElement = document.createElement('div');
+                    appointmentElement.className = 'appointment-item';
+                    appointmentElement.innerHTML = `
+                        <h4>${appointment.treatment || 'Genel Muayene'}</h4>
+                        <p>📅 ${appointment.date.toLocaleDateString('tr-TR')} - 🕐 ${appointment.time}</p>
+                        <p>👤 ${appointment.name} - 📞 ${appointment.phone}</p>
+                    `;
+                    appointmentsList.appendChild(appointmentElement);
+                });
+            }
         }
-        c.appendChild(svg);
-      }
-      async function saveOdonto(){
-        const pid=$('#odoPatient').value;
-        const p=await DB.get('patients',pid); if(!p) return;
-        const rects=$$('#odontogramCanvas rect');
-        const marks={}; rects.forEach(r=>{ if(r.getAttribute('fill')==='#0ea5e9') marks[r.dataset.idx]=true; });
-        p.teeth=marks; await DB.put('patients',p); await logAudit('odontogram.save',pid); toast('Odontogram kaydedildi');
-      }
-    },
-    async inventory(){
-      $('#dashboardView').style.display='none';
-      const list=await DB.getAll('inventory');
-      $('#routeContainer').innerHTML=`
-        <div class="card">
-          <div class="row" style="justify-content:space-between">
-            <h3 style="margin:0">Envanter</h3>
-            <button class="btn primary" id="btnNewItem">Yeni Ürün</button>
-          </div>
-          <table class="table" style="margin-top:8px">
-            <thead><tr><th>Ad</th><th>Stok</th><th>Birim</th><th></th></tr></thead>
-            <tbody id="invTbody">
-              ${list.map(it=>`<tr data-id="${it.id}"><td>${escapeHtml(it.name)}</td><td>${escapeHtml(it.stock)}</td><td>${escapeHtml(it.unit)}</td><td><button class="btn" data-act="edit">Düzenle</button> <button class="btn danger" data-act="del">Sil</button></td></tr>`).join('')}
-            </tbody>
-          </table>
-        </div>`;
-      $('#btnNewItem').onclick=()=>editItem();
-      $('#invTbody').onclick=(e)=>{ const tr=e.target.closest('tr'); if(!tr) return;
-        const id=tr.dataset.id;
-        if(e.target.matches('[data-act="edit"]')) editItem(id);
-        if(e.target.matches('[data-act="del"]')) confirmBox('Silinsin mi?', async ()=>{ await DB.del('inventory',id); go('inventory'); });
-      };
-    },
-    async billing(){
-      $('#dashboardView').style.display='none';
-      const invs=await DB.getAll('invoices');
-      $('#routeContainer').innerHTML=`
-        <div class="card">
-          <div class="row" style="justify-content:space-between">
-            <h3 style="margin:0">Faturalama</h3>
-            <button class="btn" id="btnNewInvoice">Yeni Fatura</button>
-          </div>
-          <table class="table" style="margin-top:8px">
-            <thead><tr><th>No</th><th>Tarih</th><th>Hasta</th><th>Tutar</th><th></th></tr></thead>
-            <tbody id="invTable">
-            ${await renderInvRows(invs)}
-            </tbody>
-          </table>
-        </div>`;
-      $('#btnNewInvoice').onclick=()=>createInvoice();
-      $('#invTable').onclick=(e)=>{ const tr=e.target.closest('tr'); if(!tr) return; const id=tr.dataset.id; if(e.target.matches('[data-act="open"]')) openInvoice(id); };
-      async function renderInvRows(list){
-        const rows=[];
-        for(const i of list){
-          const p=await DB.get('patients',i.patientId);
-          rows.push(`<tr data-id="${i.id}"><td>${escapeHtml(i.no)}</td><td>${new Date(i.date).toLocaleDateString()}</td><td>${escapeHtml(p?.name||i.patientId)}</td><td>${money(i.total)}</td><td><button class="btn" data-act="open">Aç</button></td></tr>`);
-        }
-        return rows.join('');
-      }
-    },
-    async reports(){
-      $('#dashboardView').style.display='none';
-      const appts=await DB.getAll('appts');
-      const month = new Date().toISOString().slice(0,7);
-      const income = appts.filter(a=> (a.start||'').slice(0,7)===month).reduce((s,a)=>s+(a.price||0),0);
-      const byDoc = {}; appts.forEach(a=>{ byDoc[a.doctor]=(byDoc[a.doctor]||0)+1; });
-      $('#routeContainer').innerHTML=`
-        <div class="card">
-          <h3>Raporlar</h3>
-          <div class="kpis">
-            <div class="kpi"><div style="font-weight:800">${appts.length}</div><small>Toplam Randevu</small></div>
-            <div class="kpi"><div style="font-weight:800">${money(income)}</div><small>Bu Ay Gelir</small></div>
-          </div>
-          <div style="height:12px"></div>
-          <div class="grid-2">
-            <div class="card">
-              <div style="font-weight:700;margin-bottom:6px">Hekime Göre Randevu</div>
-              ${Object.entries(byDoc).map(([k,v])=>`<div class="row"><div style="width:120px">${escapeHtml(k)}</div><div style="flex:1;height:10px;background:#e2e8f0;border-radius:999px;overflow:hidden"><div style="width:${v*8}px;height:10px;background:linear-gradient(90deg,#0ea5e9,#06b6d4)"></div></div><div style="width:40px;text-align:right">${v}</div></div>`).join('')}
-            </div>
-            <div class="card">
-              <div style="font-weight:700;margin-bottom:6px">Duruma Göre</div>
-              ${['Onaylı','Beklemede','Geldi','İptal'].map(st=>{
-                const v=appts.filter(a=>a.status===st).length;
-                return `<div class="row"><div style="width:120px">${st}</div><div style="flex:1;height:10px;background:#e2e8f0;border-radius:999px;overflow:hidden"><div style="width:${v*8}px;height:10px;background:linear-gradient(90deg,#10b981,#06b6d4)"></div></div><div style="width:40px;text-align:right">${v}</div></div>`
-              }).join('')}
-            </div>
-          </div>
-        </div>`;
-    },
-    async settings(){
-      $('#dashboardView').style.display='none';
-      $('#routeContainer').innerHTML=`
-        <div class="card">
-          <h3>Ayarlar</h3>
-          <div class="grid-2" style="margin-top:8px">
-            <div class="card">
-              <div style="font-weight:700">Veri Yönetimi</div>
-              <div class="row" style="margin-top:8px">
-                <button class="btn" id="btnExportAll2">Tümünü Dışa Aktar</button>
-                <button class="btn warn" id="btnImportAll">İçe Aktar (JSON)</button>
-                <button class="btn danger" id="btnReset">Tüm Veriyi Sil</button>
-              </div>
-            </div>
-            <div class="card">
-              <div style="font-weight:700">Uygulama</div>
-              <div class="row" style="margin-top:8px">
-                <button class="btn" id="btnInstallPwa">PWA Kur</button>
-                <button class="btn" id="btnPrintTest">Yazdırma Testi</button>
-              </div>
-            </div>
-          </div>
-          <div id="printProbe" class="print-area" style="display:none">
-            <h3>Yazdırma Testi</h3><p>Merhaba, bu bir deneme çıktısıdır.</p>
-          </div>
-        </div>`;
-      $('#btnExportAll2').onclick=()=>$('#btnExportAll').click();
-      $('#btnImportAll').onclick=importAll;
-      $('#btnReset').onclick=()=>confirmBox('Tüm veriler silinsin mi?', async ()=>{ indexedDB.deleteDatabase('clinic_pro_db'); location.reload(); });
-      $('#btnInstallPwa').onclick=()=>toast('Tarayıcı menüsünden Ana Ekrana Ekle seçeneğini kullanın');
-      $('#btnPrintTest').onclick=()=>{ $('#printProbe').style.display='block'; window.print(); $('#printProbe').style.display='none'; };
-    }
-  };
 
-  async function go(route, params){
-    if(!routes[route]){ toast('Sayfa bulunamadı'); return;}
-    history.replaceState({},'', '#'+route);
-    await routes[route](params);
-    window.scrollTo({top:0,behavior:'smooth'});
-  }
-
-  /* ---------------------------- Dashboard helpers ---------------------------- */
-  async function refreshKpis(){
-    const appts=await DB.getAll('appts');
-    const today=new Date().toDateString();
-    const todayCount=appts.filter(a=> new Date(a.start).toDateString()===today).length;
-    const month = new Date().toISOString().slice(0,7);
-    const income = appts.filter(a=> (a.start||'').slice(0,7)===month).reduce((s,a)=>s+(a.price||0),0);
-    const open = (await DB.getAll('invoices')).filter(i=>!i.paid).reduce((s,i)=>s+i.total,0);
-    $('#kpiToday').textContent=todayCount; $('#kpiTodayTop').textContent=todayCount;
-    $('#kpiMonth').textContent=money(income);
-    $('#kpiOpen').textContent=money(open);
-  }
-
-  async function renderDoctors(){
-    const users=(await DB.getAll('users')).filter(u=>u.role==='Hekim');
-    const list=$('#doctorList'); list.innerHTML='';
-    if(users.length===0){ list.innerHTML='<div class="small">Hekim yok</div>'; return; }
-    for(const u of users){
-      const el=document.createElement('div'); el.className='row'; el.style.justifyContent='space-between';
-      el.innerHTML=`<div class="row"><div class="avatar" style="width:40px;height:40px">${escapeHtml(u.name.split(' ')[1]?.[0]||u.name[0])}</div><div><div style="font-weight:700">${escapeHtml(u.name)}</div><div class="small">Genel Diş Hekimi</div></div></div><div><button class="btn" data-id="${u.id}">Profil</button></div>`;
-      el.querySelector('button').onclick=()=>modal(`<div><strong>${escapeHtml(u.name)}</strong><p class="small">Rol: ${escapeHtml(u.role)}</p></div>`,'Hekim Bilgisi');
-      list.appendChild(el);
-    }
-  }
-
-  async function renderTodayAppointments(){
-    const appts=await DB.getAll('appts');
-    const today=new Date().toDateString();
-    const rows=appts.filter(a=> new Date(a.start).toDateString()===today).sort((a,b)=>new Date(a.start)-new Date(b.start)).slice(0,12);
-    const wrap=$('#apptList'); wrap.innerHTML='';
-    if(rows.length===0){ wrap.innerHTML='<div class="small">Bugün randevu yok</div>'; return; }
-    for(const a of rows){
-      const p=await DB.get('patients',a.patientId);
-      const div=document.createElement('div');
-      div.className='row'; div.style.justifyContent='space-between'; div.style.padding='8px'; div.style.border='1px solid rgba(2,6,23,0.06)'; div.style.borderRadius='10px';
-      div.innerHTML=`<div><div style="font-weight:700">${escapeHtml(p?.name||a.patientId)}</div><div class="small">${new Date(a.start).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})} • ${escapeHtml(a.doctor)}</div></div><div><button class="btn" data-id="${a.id}">Aç</button></div>`;
-      div.querySelector('button').onclick=()=>openAppt(a.id);
-      wrap.appendChild(div);
-    }
-  }
-
-  /* ---------------------------- Patients ---------------------------- */
-  function editPatient(id){
-    (async ()=>{
-      const p = id ? await DB.get('patients',id) : {id:uid('pat')};
-      modal(`<form id="pForm" class="col">
-        <label class="small">Ad Soyad<input class="input" id="pName" value="${escapeHtml(p.name||'')}" required/></label>
-        <label class="small">Telefon<input class="input" id="pPhone" value="${escapeHtml(p.phone||'')}"/></label>
-        <label class="small">Doğum Yılı<input class="input" type="number" id="pBirth" value="${escapeHtml(p.birth||'')}"/></label>
-        <label class="small">Notlar<textarea class="input" id="pNotes">${escapeHtml(p.notes||'')}</textarea></label>
-        <div style="text-align:right"><button type="button" class="btn" id="cancel">İptal</button> <button class="btn primary" type="submit">Kaydet</button></div>
-      </form>${id?`<div class="row" style="justify-content:space-between;margin-top:10px"><button class="btn danger" id="delP">Hastayı Sil</button><button class="btn" id="exportP">Dışa Aktar</button></div>`:''}`,'Hasta');
-      $('#cancel').onclick=closeModal;
-      $('#pForm').onsubmit=async (e)=>{ e.preventDefault(); const obj={
-        id:p.id, name:$('#pName').value.trim(), phone:$('#pPhone').value.trim(), birth:$('#pBirth').value.trim(), notes:$('#pNotes').value.trim(), createdAt:p.createdAt||nowISO(), teeth:p.teeth||{}
-      }; await DB.put('patients',obj); await logAudit(id?'patient.update':'patient.create',obj.id); toast('Kaydedildi'); closeModal(); go('patients'); };
-      if(id){
-        $('#delP').onclick=()=>confirmBox('Hasta silinsin mi?', async ()=>{ await DB.del('patients',p.id); await logAudit('patient.delete',p.id); closeModal(); go('patients'); });
-        $('#exportP').onclick=()=>downloadFile(`hasta-${p.id}.json`, JSON.stringify(p,null,2), 'application/json');
-      }
-    })();
-  }
-
-  async function openPatient(id){
-    const p = await DB.get('patients',id); if(!p){ toast('Hasta bulunamadı'); return; }
-    modal(`<div class="grid-2">
-      <div class="col">
-        <div><strong>${escapeHtml(p.name)}</strong></div>
-        <div class="small">${escapeHtml(p.phone||'')} • ${escapeHtml(p.birth||'')}</div>
-        <div style="margin-top:8px"><button class="btn" id="editP">Düzenle</button> <button class="btn" id="newAppt">Randevu</button></div>
-      </div>
-      <div class="col">
-        <div style="font-weight:700">Notlar</div>
-        <div class="small" style="white-space:pre-wrap">${escapeHtml(p.notes||'—')}</div>
-      </div>
-    </div>`, 'Hasta Detayı');
-    $('#editP').onclick=()=>{ closeModal(); editPatient(id); };
-    $('#newAppt').onclick=()=>{ closeModal(); openQuickApptModal({patientId:id}); };
-  }
-
-  async function importCSVPatients(){
-    modal(`<div><p class="small">CSV formatı: name,phone,birth</p><input type="file" id="csvFile" accept=".csv" /><div style="text-align:right;margin-top:8px"><button class="btn primary" id="doImport">İçe Aktar</button></div></div>`,'CSV İçe Aktar');
-    setTimeout(()=>{
-      $('#doImport').addEventListener('click', async ()=>{
-        const f=$('#csvFile'); if(!f.files[0]){ toast('Dosya seçin'); return; }
-        const text = await f.files[0].text(); const lines = text.split(/\\r?\\n/).map(l=>l.trim()).filter(Boolean);
-        for(const ln of lines){
-          const parts = ln.split(',');
-          const obj={id:uid('pat'),name:parts[0]||'İsimsiz',phone:parts[1]||'',birth:parts[2]||'',createdAt:nowISO(),teeth:{}};
-          await DB.put('patients',obj);
-        }
-        await logAudit('patients.import.csv',lines.length);
-        toast('CSV içe aktarma tamamlandı'); closeModal(); go('patients');
-      },{once:true});
-    },50);
-  }
-
-  /* ---------------------------- Appointments ---------------------------- */
-  function openQuickApptModal(pref={}){
-    (async ()=>{
-      const pats=await DB.getAll('patients');
-      const options=pats.slice(0,200).map(p=>`<option value="${p.id}" ${pref.patientId===p.id?'selected':''}>${escapeHtml(p.name)}</option>`).join('');
-      modal(`<div class="col">
-        <label class="small">Hasta<select class="input" id="qaPatient">${options}</select></label>
-        <label class="small">Hekim<input class="input" id="qaDoctor" value="${escapeHtml(pref.doctor||'Dr. Elif')}"/></label>
-        <label class="small">Tarih & Saat<input class="input" id="qaDatetime" type="datetime-local" value="${new Date().toISOString().slice(0,16)}"/></label>
-        <label class="small">Ücret<input class="input" id="qaPrice" type="number" value="500"/></label>
-        <div style="text-align:right"><button class="btn" id="cancelAp">İptal</button> <button class="btn primary" id="createQuickAppt">Oluştur</button></div>
-      </div>`, 'Hızlı Randevu');
-      $('#cancelAp').onclick=closeModal;
-      $('#createQuickAppt').onclick=async ()=>{
-        const ap={id:uid('appt'),patientId:$('#qaPatient').value,doctor:$('#qaDoctor').value.trim(),start:new Date($('#qaDatetime').value).toISOString(),duration:30,status:'Onaylı',createdAt:nowISO(),price:parseFloat($('#qaPrice').value||'0')};
-        const all=await DB.getAll('appts');
-        const conflict=all.some(a=> a.doctor===ap.doctor && Math.abs(new Date(a.start)-new Date(ap.start))<30*60000);
-        if(conflict){ toast('Uyarı: Çakışma tespit edildi'); }
-        await DB.put('appts',ap); await logAudit('appt.create',ap.id);
-        toast('Randevu kaydedildi'); closeModal(); refreshKpis(); go('appointments');
-      };
-    })();
-  }
-
-  async function openAppt(id){
-    const a=await DB.get('appts',id); if(!a){ toast('Randevu yok'); return; }
-    const p=await DB.get('patients',a.patientId);
-    modal(`<div class="col">
-      <div class="row" style="justify-content:space-between">
-        <div><strong>${escapeHtml(p?.name||a.patientId)}</strong><div class="small">${new Date(a.start).toLocaleString()} • ${escapeHtml(a.doctor)}</div></div>
-        <div><span class="badge">${escapeHtml(a.status)}</span></div>
-      </div>
-      <div class="row" style="justify-content:flex-end">
-        <button class="btn" id="markCame">Geldi</button>
-        <button class="btn warn" id="markWait">Beklemede</button>
-        <button class="btn danger" id="markCancel">İptal</button>
-        <button class="btn" id="toInvoice">Fatura</button>
-      </div>
-    </div>`, 'Randevu');
-    $('#markCame').onclick=()=>updateStatus('Geldi');
-    $('#markWait').onclick=()=>updateStatus('Beklemede');
-    $('#markCancel').onclick=()=>updateStatus('İptal');
-    $('#toInvoice').onclick=()=>{ closeModal(); createInvoice(a); };
-    async function updateStatus(s){ a.status=s; await DB.put('appts',a); await logAudit('appt.status',s); toast('Durum güncellendi'); closeModal(); go('appointments'); }
-  }
-
-  /* ---------------------------- Inventory ---------------------------- */
-  function editItem(id){
-    (async ()=>{
-      const it = id ? await DB.get('inventory',id) : {id:uid('inv'),stock:0,unit:'adet'};
-      modal(`<form id="iForm" class="col">
-        <label class="small">Ad<input class="input" id="iName" value="${escapeHtml(it.name||'')}" required/></label>
-        <label class="small">Stok<input class="input" id="iStock" type="number" value="${escapeHtml(it.stock||0)}" required/></label>
-        <label class="small">Birim<input class="input" id="iUnit" value="${escapeHtml(it.unit||'adet')}" required/></label>
-        <div style="text-align:right"><button type="button" class="btn" id="cancelI">İptal</button> <button class="btn primary" type="submit">Kaydet</button></div>
-      </form>`, 'Ürün');
-      $('#cancelI').onclick=closeModal;
-      $('#iForm').onsubmit=async (e)=>{ e.preventDefault(); const obj={
-        id:it.id, name:$('#iName').value.trim(), stock:parseFloat($('#iStock').value||'0'), unit:$('#iUnit').value.trim()
-      }; await DB.put('inventory',obj); await logAudit(id?'inv.update':'inv.create',obj.id); toast('Kaydedildi'); closeModal(); go('inventory'); };
-    })();
-  }
-
-  /* ---------------------------- Billing ---------------------------- */
-  async function createInvoice(fromAppt){
-    const pats=await DB.getAll('patients');
-    const appts=await DB.getAll('appts');
-    const patOptions=pats.map(p=>`<option value="${p.id}" ${fromAppt&&fromAppt.patientId===p.id?'selected':''}>${escapeHtml(p.name)}</option>`).join('');
-    modal(`<div class="col">
-      <label class="small">Hasta<select class="input" id="inPatient">${patOptions}</select></label>
-      <label class="small">Tutar (₺)<input class="input" id="inAmount" type="number" value="${fromAppt?(fromAppt.price||0):500}"/></label>
-      <label class="small">Açıklama<input class="input" id="inDesc" placeholder="İşlem açıklaması"/></label>
-      <div class="row" style="justify-content:space-between">
-        <button class="btn" id="cancelInv">İptal</button>
-        <button class="btn primary" id="saveInv">Kaydet</button>
-      </div>
-    </div>`, 'Fatura');
-    $('#cancelInv').onclick=closeModal;
-    $('#saveInv').onclick=async ()=>{
-      const inv={id:uid('inv'), no:'INV-'+Math.random().toString(36).slice(2,7).toUpperCase(), date:nowISO(), patientId:$('#inPatient').value, total:parseFloat($('#inAmount').value||'0'), desc:$('#inDesc').value.trim(), paid:false};
-      await DB.put('invoices',inv); await logAudit('invoice.create',inv.id); closeModal(); go('billing');
-    };
-  }
-
-  async function openInvoice(id){
-    const inv=await DB.get('invoices',id); const p=await DB.get('patients',inv.patientId);
-    modal(`<div class="col">
-      <div class="row" style="justify-content:space-between">
-        <div><strong>${escapeHtml(inv.no)}</strong><div class="small">${new Date(inv.date).toLocaleString()}</div></div>
-        <div><span class="badge">${inv.paid?'Ödendi':'Açık'}</span></div>
-      </div>
-      <div>Hasta: <strong>${escapeHtml(p?.name||inv.patientId)}</strong></div>
-      <div>Tutar: <strong>${money(inv.total)}</strong></div>
-      <div>Açıklama: <span class="small">${escapeHtml(inv.desc||'—')}</span></div>
-      <div class="row" style="justify-content:flex-end">
-        <button class="btn" id="markPaid">${inv.paid?'Ödemeyi Kaldır':'Ödendi İşaretle'}</button>
-        <button class="btn" id="printInv">Yazdır</button>
-        <button class="btn" id="exportInv">Dışa Aktar</button>
-      </div>
-      <div id="printInvoice" class="print-area" style="display:none">
-        <h2>Fatura ${escapeHtml(inv.no)}</h2>
-        <p>Tarih: ${new Date(inv.date).toLocaleDateString()}</p>
-        <p>Hasta: ${escapeHtml(p?.name||'—')}</p>
-        <p>Tutar: ${money(inv.total)}</p>
-        <p>Açıklama: ${escapeHtml(inv.desc||'—')}</p>
-      </div>
-    </div>`, 'Fatura');
-    $('#markPaid').onclick=async ()=>{ inv.paid=!inv.paid; await DB.put('invoices',inv); toast('Güncellendi'); closeModal(); go('billing'); };
-    $('#printInv').onclick=()=>{ $('#printInvoice').style.display='block'; window.print(); $('#printInvoice').style.display='none'; };
-    $('#exportInv').onclick=()=>downloadFile(`${inv.no}.json`, JSON.stringify(inv,null,2), 'application/json');
-  }
-
-  /* ---------------------------- Audit Export ---------------------------- */
-  $('#btnExportAudit').addEventListener('click', async ()=>{
-    const audit = await DB.getAll('audit');
-    downloadFile('audit.json', JSON.stringify(audit,null,2), 'application/json');
-  });
-
-  /* ---------------------------- PWA ---------------------------- */
-  async function registerPWA(){
-    if('serviceWorker' in navigator){
-      const swCode = `
-        const CACHE='clinic_pro_cache_v1';
-        self.addEventListener('install', e=>{ e.waitUntil(caches.open(CACHE).then(c=>c.addAll(['./']))); self.skipWaiting(); });
-        self.addEventListener('activate', e=>{ clients.claim(); });
-        self.addEventListener('fetch', e=>{ if(e.request.method==='GET'){ e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(resp=>{ const c=resp.clone(); caches.open(CACHE).then(cache=>cache.put(e.request,c)); return resp; }))); }});
-      `;
-      const blob = new Blob([swCode],{type:'application/javascript'}); const url = URL.createObjectURL(blob);
-      try{ await navigator.serviceWorker.register(url); $('#statusBadge').textContent='Online'; $('#swState').textContent='Kayıtlı'; }
-      catch(e){ $('#statusBadge').textContent='SW Hata'; $('#swState').textContent='Hata'; }
-    } else { $('#statusBadge').textContent='SW Destek Yok'; }
-  }
-
-  /* ---------------------------- Init ---------------------------- */
-  async function init(){
-    // theme
-    if(localStorage.getItem('theme')==='dark') document.body.classList.add('dark');
-    await DB.open();
-    await seedIfEmpty();
-    await registerPWA();
-    setupNav();
-    // shortcuts
-    window.addEventListener('keydown',(e)=>{
-      if(e.key==='n' && !['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)){ e.preventDefault(); go('patients'); setTimeout(()=>editPatient(),200); }
-      if(e.key==='a' && !['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)){ e.preventDefault(); openQuickApptModal(); }
-      if(e.key==='f'){ $('#globalSearch').focus(); }
-      if(e.key==='s'){ toast('Sistem testi...'); setTimeout(()=>toast('Test tamam'),800); }
-    });
-    // route from hash
-    const hash=location.hash.replace('#','')||'dashboard';
-    await go(hash);
-  }
-
-  init();
-
-})(); /* end IIFE */
-</script>
+        // Initialize the calendar when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new AppointmentCalendar();
+        });
+    </script>
 </body>
 </html>
