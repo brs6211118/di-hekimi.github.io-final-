@@ -1,0 +1,24 @@
+{
+  "name": "dental-clinic-system",
+  "version": "1.0.0",
+  "description": "Complete dental clinic management system with Express.js backend and modern frontend",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "NODE_ENV=development node src/server.js",
+    "seed": "node src/seed.js",
+    "build": "echo 'Static frontend - no build needed'",
+    "deploy": "npm run seed && npm start"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": ["dental", "clinic", "management", "express", "api"],
+  "author": "Dental Clinic System",
+  "license": "MIT"
+}
